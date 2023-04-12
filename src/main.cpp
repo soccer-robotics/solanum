@@ -11,11 +11,19 @@
 #include <goalie.h>
 #include <constants.hpp>
 
+Infra infra;
+Gyro gyro;
+
 void setup() {
     pinMode(13, OUTPUT);
     digitalWrite(13, HIGH);
+    Serial.begin(9600);
+    gyro.calibrate();
+    gyro.setRefHeading();
 }
 
 void loop() {
-    delay(1000);
+    infra.read();
+    gyro.getHeading();
+    delay(100);
 }

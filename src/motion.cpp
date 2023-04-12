@@ -1,4 +1,5 @@
 #include <motion.h>
+#include <constants.hpp>
 #include <Arduino.h>
 
 Motion::Motion(int pins[4][2]) {

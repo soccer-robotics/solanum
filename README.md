@@ -9,9 +9,9 @@ Build on Platformio; source files stored in `/src`
 |-|-|-|-|
 | Motion | `motion.h` | Take movement angle and speed and output motor commands | Finished |
 | Solenoid | `solenoid.h` | Charge and fire solenoid | Not started |
-| Infrared | `infra.h` | Get infrared sensor readings and calculate ball heading/distance | Not started |
-| Gyro | `gyro.h` | Get compass (IMU) readings | Not started |
-| Line | `line.h` | Read line sensors and calculate line edge | Not started |
+| Infrared | `infra.h` | Get infrared sensor readings and calculate ball heading/distance | In Progress |
+| Gyro | `gyro.h` | Get compass (IMU) readings | Finished |
+| Line | `line.h` | Read line sensors and calculate line edge | In progress |
 | Ultrasound | `ultra.h` | Get ultrasound readings and calculate approximate position | Not started |
 | Camera | `cam.h` | Interface with OpenMV and get goal angles | Not started |
 | Bluetooth | `blue.h` | Inter-robot communications | Not started
@@ -21,6 +21,12 @@ Build on Platformio; source files stored in `/src`
 | Main | `main.cpp` | Main program | In progress |
 
 ## Checklist
-- [ ] The entire codebase is basically empty
+- [ ] Orbit
+- [ ] Ultrasound interfacing
+- [ ] Line Projection
+- [ ] Line Sensor reading
+- [ ] Infrared reliability
+- [x] Basic Infrared code
+- [x] BNO055 interfacing
 - [x] Preliminary motor code
 - [x] Set up skeleton
