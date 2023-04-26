@@ -13,17 +13,88 @@
 
 Infra infra;
 Gyro gyro;
+Line line;
+Motion motion;
+Ultra ultra;
+
+bool switchState = 0;
 
 void setup() {
+    pinMode(constants::SWITCHPIN, INPUT);
     pinMode(13, OUTPUT);
-    digitalWrite(13, HIGH);
-    Serial.begin(9600);
-    gyro.calibrate();
-    gyro.setRefHeading();
+    for (int i=0; i<4; i++) {
+        pinMode(constants::MOTORPINS[i][0], OUTPUT);
+        pinMode(constants::MOTORPINS[i][1], OUTPUT);
+    }
+    // CHANGE!!! gyro.calibrate();
+    // flash LED to indicate calibration
+    for (int i=0; i<3; i++) {
+        digitalWrite(13, HIGH);
+        delay(200);
+        digitalWrite(13, LOW);
+        delay(200);
+    }
+}
+
+void loop_motorTest() {
+    /*
+    // Test each motor in turn
+    for (int i=0; i<4; i++) {
+        digitalWrite(constants::MOTORPINS[i][0], 1);
+        analogWrite(constants::MOTORPINS[i][1], 200);
+        //delay(1000);
+        //analogWrite(constants::MOTORPINS[i][1], 0);
+    }
+    delay(1000);
+    for (int i=0; i<4; i++) {
+        digitalWrite(constants::MOTORPINS[i][0], 0);
+        analogWrite(constants::MOTORPINS[i][1], 200);
+        //delay(1000);
+        //analogWrite(constants::MOTORPINS[i][1], 0);
+    }
+    delay(1000);
+    */
+    for (int i=0; i<360; i+=45) {
+        motion.move(i, 200, 0);
+        delay(1000);        
+    }    
+}
+
+void loop_motorGyroTest() {
+    for (int i=0; i<360; i+=45) {
+        for (int j=0; j<100; j++) {
+            int ang = gyro.getHeading();
+            // simple proportional control
+            if (ang > 180) {
+                ang -= 360;
+            }
+            int rot = ang * 1.5;
+            motion.move(i, 200, -rot);
+            delay(10);
+        }
+    }
 }
 
 void loop() {
-    infra.read();
-    gyro.getHeading();
-    delay(100);
+    // When switch is turned on:
+    if (digitalRead(constants::SWITCHPIN) == HIGH && switchState == 0) {
+        switchState = 1;
+        digitalWrite(13, HIGH);
+        // set gyro reference heading
+        //gyro.setRefHeading();
+    }
+    // When switch is turned off:
+    else if (digitalRead(constants::SWITCHPIN) == LOW && switchState == 1) {
+        switchState = 0;
+        digitalWrite(13, LOW);
+    }
+    // When switch is on:
+    else if (switchState == 1) {
+        //infra.read();
+        ultra.debug();
+    }
+    // When switch is off:
+    else if (switchState == 0) {
+        motion.panic();
+    }
 }

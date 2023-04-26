@@ -12,7 +12,7 @@ Build on Platformio; source files stored in `/src`
 | Infrared | `infra.h` | Get infrared sensor readings and calculate ball heading/distance | In Progress |
 | Gyro | `gyro.h` | Get compass (IMU) readings | Finished |
 | Line | `line.h` | Read line sensors and calculate line edge | In progress |
-| Ultrasound | `ultra.h` | Get ultrasound readings and calculate approximate position | Not started |
+| Ultrasound | `ultra.h` | Get ultrasound readings and calculate approximate position | In Progress |
 | Camera | `cam.h` | Interface with OpenMV and get goal angles | Not started |
 | Bluetooth | `blue.h` | Inter-robot communications | Not started
 | Orbit | `orbit.h` | Calculate optimal robot trajectories (Offense) | Not started |

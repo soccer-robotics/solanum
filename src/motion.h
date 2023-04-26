@@ -1,7 +1,8 @@
 class Motion {
     public:
-        Motion(int pins[4][2]);
+        Motion();
         void move(int angle, double speed, int rot);
+        void panic();
         int fast_sin(int angle);
         int fast_cos(int angle);
     private:

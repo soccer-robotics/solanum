@@ -3,9 +3,11 @@
 class Infra {
     public:
         Infra();
-        int read();
+        int read(); // returns angle of infrared vector
+        int _len(int num); // number of digits in num
     private:
-        MCP3008 _mcp[3];
-        int _xcomp[3][8];
-        int _ycomp[3][8];
+        MCP3008 _mcp[3]; // 3 MCP3008 chips
+        int _xcomp[24]; // precalculated cosine
+        int _ycomp[24]; // precalculated sine
+        int _ir[24];
 };

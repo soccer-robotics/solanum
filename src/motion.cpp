@@ -2,10 +2,15 @@
 #include <constants.hpp>
 #include <Arduino.h>
 
-Motion::Motion(int pins[4][2]) {
+Motion::Motion() {
     // lookup table for sin() values (0-90 degrees)
     for (int i = 0; i < 91; i++) {
         _sin[i] = sin(i * PI / 180) * 255;
+    }
+    for (int i=0; i<4; i++) {
+        for (int j=0; j<2; j++) {
+            _pins[i][j] = constants::MOTORPINS[i][j];
+        }
     }
 }
 
@@ -36,22 +41,29 @@ void Motion::move(int angle, double speed, int rot) {
     */
 
     // tilt reference frame so top left is 0 degrees
-    int y = fast_sin(angle + 45) * speed;
-    int x = fast_cos(angle + 45) * speed;
+    int y = cos((angle - 40) * PI / 180) * speed;
+    int x = cos((angle + 40) * PI / 180) * speed;
 
     // set topleft
-    analogWrite(_pins[0][0], y + rot > 0);
+    digitalWrite(_pins[0][0], (y + rot) > 0);
     analogWrite(_pins[0][1], abs(y + rot));
 
     // set topright
-    analogWrite(_pins[1][0], x + rot > 0);
+    digitalWrite(_pins[1][0], (x + rot) > 0);
     analogWrite(_pins[1][1], abs(x + rot));
 
     // set bottomright
-    analogWrite(_pins[2][0], -y + rot > 0);
+    digitalWrite(_pins[2][0], (-y + rot) > 0);
     analogWrite(_pins[2][1], abs(-y + rot));
 
     // set bottomleft
-    analogWrite(_pins[3][0], -x + rot > 0);
+    digitalWrite(_pins[3][0], (-x + rot) > 0);
     analogWrite(_pins[3][1], abs(-x + rot));
+}
+
+void Motion::panic() {
+    for (int i=0; i<4; i++) {
+        digitalWrite(_pins[i][0], 0);
+        analogWrite(_pins[i][1], 0);
+    }
 }

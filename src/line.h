@@ -10,4 +10,6 @@ class Line {
         MCP3008 _mcp[3];
         int _xcomp[3][8];
         int _ycomp[3][8];
+        int _line[24];
+        int _len(int num);
 };
