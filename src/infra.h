@@ -7,7 +7,7 @@ class Infra {
         int _len(int num); // number of digits in num
     private:
         MCP3008 _mcp[3]; // 3 MCP3008 chips
-        int _xcomp[24]; // precalculated cosine
-        int _ycomp[24]; // precalculated sine
+        float _xcomp[24]; // precalculated cosine
+        float _ycomp[24]; // precalculated sine
         int _ir[24];
 };

@@ -14,7 +14,7 @@ Motion::Motion() {
     }
 }
 
-int Motion::fast_sin(int angle) {
+float Motion::fast_sin(int angle) {
     // normalize angle to 0-360 degrees
     angle = ((angle % 360) + 360) % 360;
 
@@ -29,7 +29,7 @@ int Motion::fast_sin(int angle) {
         return -_sin[360 - angle];
 }
 
-int Motion::fast_cos(int angle) {
+float Motion::fast_cos(int angle) {
     return fast_sin(angle + 90);
 }
 

@@ -19,6 +19,8 @@ Ultra ultra;
 
 bool switchState = 0;
 
+int ballAngle;
+
 void setup() {
     pinMode(constants::SWITCHPIN, INPUT);
     pinMode(13, OUTPUT);
@@ -26,7 +28,7 @@ void setup() {
         pinMode(constants::MOTORPINS[i][0], OUTPUT);
         pinMode(constants::MOTORPINS[i][1], OUTPUT);
     }
-    // CHANGE!!! gyro.calibrate();
+    gyro.calibrate();
     // flash LED to indicate calibration
     for (int i=0; i<3; i++) {
         digitalWrite(13, HIGH);
@@ -75,13 +77,29 @@ void loop_motorGyroTest() {
     }
 }
 
+void loop_ballTrack() {
+    int ang = gyro.getHeading();
+    // simple proportional control
+    if (ang > 180) {
+        ang -= 360;
+    }
+    int rot = ang * 1.5;
+
+    // track ball
+    ballAngle = infra.read();
+    motion.move(ballAngle, 255, -rot);
+    //Serial.println(ballAngle);
+    delay(1);
+    //ultra.debug();
+}
+
 void loop() {
     // When switch is turned on:
     if (digitalRead(constants::SWITCHPIN) == HIGH && switchState == 0) {
         switchState = 1;
         digitalWrite(13, HIGH);
         // set gyro reference heading
-        //gyro.setRefHeading();
+        gyro.setRefHeading();
     }
     // When switch is turned off:
     else if (digitalRead(constants::SWITCHPIN) == LOW && switchState == 1) {
@@ -90,8 +108,7 @@ void loop() {
     }
     // When switch is on:
     else if (switchState == 1) {
-        //infra.read();
-        ultra.debug();
+        loop_ballTrack();
     }
     // When switch is off:
     else if (switchState == 0) {

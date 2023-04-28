@@ -13,8 +13,8 @@ Infra::Infra() {
         );
     }
     for (int i = 0; i < 24; i++) {
-        _xcomp[i] = sin((i+1) * PI / 12);
-        _ycomp[i] = cos((i+1) * PI / 12);
+        _xcomp[i] = cos((i+1) * PI / 12);
+        _ycomp[i] = sin((i+1) * PI / 12);
     }
 }
 
@@ -30,10 +30,16 @@ int Infra::read() {
         }
     }
 
-    // bandage failed sensors 20, 12, 13
-    // _ir[20] = (_ir[19] + _ir[21]) / 2;
+    // bandage failed sensor 14
+    _ir[13] = (_ir[15] + _ir[11]) / 2;
     // _ir[12] = (_ir[11] + _ir[14]) / 2;
     // _ir[13] = (_ir[11] + _ir[14]) / 2;
+
+    // simulate values for every other sensor (since not soldered yet)
+    _ir[0] = (_ir[1] + _ir[23]) / 2;
+    for (int i=2; i<24; i+=2) {
+        _ir[i] = (_ir[i+1] + _ir[i-1]) / 2;
+    }
 
     // vector addition of all 24 sensors
     int x = 0;
