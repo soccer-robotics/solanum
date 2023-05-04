@@ -31,7 +31,7 @@ int Infra::read() {
     }
 
     // bandage failed sensor 14
-    _ir[13] = (_ir[15] + _ir[11]) / 2;
+    // _ir[13] = (_ir[15] + _ir[11]) / 2;
     // _ir[12] = (_ir[11] + _ir[14]) / 2;
     // _ir[13] = (_ir[11] + _ir[14]) / 2;
 

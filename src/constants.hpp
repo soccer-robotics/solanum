@@ -19,6 +19,9 @@ namespace constants
     // ADC pins for Line Sensors
     const int LINE_CS[3] = {26, 28, 27};
 
+    // Threshold for line sensors
+    const int LINE_THRESHOLD = 600;
+
     // Trigger and echo pins for ultrasonic
     const int ULTRA_TRIG[4] = {14, 15, 16, 17};
     const int ULTRA_ECHO = 20;

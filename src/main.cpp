@@ -16,6 +16,7 @@ Gyro gyro;
 Line line;
 Motion motion;
 Ultra ultra;
+Orbit orbit;
 
 bool switchState = 0;
 
@@ -28,7 +29,7 @@ void setup() {
         pinMode(constants::MOTORPINS[i][0], OUTPUT);
         pinMode(constants::MOTORPINS[i][1], OUTPUT);
     }
-    gyro.calibrate();
+    //gyro.calibrate();
     // flash LED to indicate calibration
     for (int i=0; i<3; i++) {
         digitalWrite(13, HIGH);
@@ -39,27 +40,17 @@ void setup() {
 }
 
 void loop_motorTest() {
-    /*
     // Test each motor in turn
     for (int i=0; i<4; i++) {
         digitalWrite(constants::MOTORPINS[i][0], 1);
         analogWrite(constants::MOTORPINS[i][1], 200);
-        //delay(1000);
-        //analogWrite(constants::MOTORPINS[i][1], 0);
+        delay(1000);
+        analogWrite(constants::MOTORPINS[i][1], 0);
     }
-    delay(1000);
-    for (int i=0; i<4; i++) {
-        digitalWrite(constants::MOTORPINS[i][0], 0);
-        analogWrite(constants::MOTORPINS[i][1], 200);
-        //delay(1000);
-        //analogWrite(constants::MOTORPINS[i][1], 0);
-    }
-    delay(1000);
-    */
-    for (int i=0; i<360; i+=45) {
+    /*for (int i=0; i<360; i+=45) {
         motion.move(i, 200, 0);
         delay(1000);        
-    }    
+    }*/
 }
 
 void loop_motorGyroTest() {
@@ -93,6 +84,29 @@ void loop_ballTrack() {
     //ultra.debug();
 }
 
+void loop_orbit() {
+    int ang = gyro.getHeading();
+
+    // simple proportional control
+    if (ang > 180) {
+        ang -= 360;
+    }
+    int rot = ang * 1.5;
+
+    // track ball
+    ballAngle = infra.read();
+
+    // get orbit
+    int orbitAngle = orbit.getOrbit(ballAngle);
+
+    // line
+    orbitAngle = line.redirect(orbitAngle);
+
+    // move
+    motion.move(orbitAngle, 200, -rot);
+    delay(1);
+}
+
 void loop() {
     // When switch is turned on:
     if (digitalRead(constants::SWITCHPIN) == HIGH && switchState == 0) {
@@ -108,7 +122,8 @@ void loop() {
     }
     // When switch is on:
     else if (switchState == 1) {
-        loop_ballTrack();
+        line.getLine();
+        delay(50);
     }
     // When switch is off:
     else if (switchState == 0) {
