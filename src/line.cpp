@@ -74,15 +74,30 @@ int Line::redirect(int angle) {
     // get line sensor data
     std::pair<int, int> line = getLine();
     if (line.first == -1 || line.second == -1) {
+        _prev = -1;
         return angle;
     }
-    // calculate line angle (https://stackoverflow.com/a/1159336)
-    int diff = ( (line.first - line.second + 180 + 360 ) % 360 ) - 180;
-    int l_angle = (360 + line.second + ( diff / 2 ) ) % 360;
+
+    // calculate line angle
+    int diff = ( (line.first * 15 - line.second * 15 + 180 + 360 ) % 360 ) - 180;
+    int l_angle = (360 + line.second * 15 + ( diff / 2 ) ) % 360;
+
+    // if the line angle has flipped, we are crossing the line: initiate panic return
+    if (_prev != -1 &&
+        min(
+            180 - abs(abs(l_angle - _prev) % 360 - 180),
+            180 - abs(abs(_prev - l_angle) % 360 - 180)
+        ) > 160
+    ) {
+        return _prev;
+    }
+    else {
+        _prev = l_angle;
+    }
     
-    // get two angles perpendicular to line
-    int a1 = (l_angle + 90) % 360;
-    int a2 = (l_angle - 90 + 360) % 360;
+    // get two angles perpendicular (ish) to line
+    int a1 = (l_angle + 90 + constants::LINE_SAFETY) % 360;
+    int a2 = (l_angle - 90 - constants::LINE_SAFETY + 360) % 360;
 
     // is angle against the line?
     // angle is between a1 and l_angle, or between l_angle and a2 means it's towards the line

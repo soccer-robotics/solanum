@@ -34,15 +34,17 @@ float Motion::fast_cos(int angle) {
 }
 
 void Motion::move(int angle, double speed, int rot) {
-    /*
-    speed is the magnitude of the vector (0-1);
-    this ensures that the "speed" value will
-    always be the same, regardless of the angle
-    */
-
     // tilt reference frame so top left is 0 degrees
-    int y = cos((angle - 40) * PI / 180) * speed;
-    int x = cos((angle + 40) * PI / 180) * speed;
+    int y = fast_cos(angle - 40) * speed;
+    int x = fast_cos(angle + 40) * speed;
+
+    // normalize
+    int max = abs(x + rot);
+    if (abs(y+rot) > max) {
+        max = abs(y + rot);
+    }
+    x = x * 255 / max;
+    y = y * 255 / max;
 
     // set topleft
     digitalWrite(_pins[0][0], (y + rot) > 0);

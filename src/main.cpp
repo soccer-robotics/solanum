@@ -29,7 +29,7 @@ void setup() {
         pinMode(constants::MOTORPINS[i][0], OUTPUT);
         pinMode(constants::MOTORPINS[i][1], OUTPUT);
     }
-    //gyro.calibrate();
+    gyro.calibrate();
     // flash LED to indicate calibration
     for (int i=0; i<3; i++) {
         digitalWrite(13, HIGH);
@@ -78,10 +78,17 @@ void loop_ballTrack() {
 
     // track ball
     ballAngle = infra.read();
-    motion.move(ballAngle, 255, -rot);
+    motion.move(line.redirect(ballAngle), 255, -rot);
     //Serial.println(ballAngle);
     delay(1);
     //ultra.debug();
+}
+
+void loop_sens() {
+    infra.read();
+    gyro.getHeading();
+    line.getLine();
+    delay(50);
 }
 
 void loop_orbit() {
@@ -95,16 +102,17 @@ void loop_orbit() {
 
     // track ball
     ballAngle = infra.read();
+    int proximity = infra.distance();
 
     // get orbit
-    int orbitAngle = orbit.getOrbit(ballAngle);
+    int orbitAngle = orbit.getOrbit(ballAngle, proximity);
 
     // line
     orbitAngle = line.redirect(orbitAngle);
 
     // move
-    motion.move(orbitAngle, 200, -rot);
-    delay(1);
+    motion.move(orbitAngle, 255, -rot);
+    delay(2);
 }
 
 void loop() {
@@ -122,8 +130,7 @@ void loop() {
     }
     // When switch is on:
     else if (switchState == 1) {
-        line.getLine();
-        delay(50);
+        loop_orbit();
     }
     // When switch is off:
     else if (switchState == 0) {

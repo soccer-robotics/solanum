@@ -9,23 +9,29 @@ Build on Platformio; source files stored in `/src`
 |-|-|-|-|
 | Motion | `motion.h` | Take movement angle and speed and output motor commands | Finished |
 | Solenoid | `solenoid.h` | Charge and fire solenoid | Not started |
-| Infrared | `infra.h` | Get infrared sensor readings and calculate ball heading/distance | In Progress |
+| Infrared | `infra.h` | Get infrared sensor readings and calculate ball heading/distance | Finished |
 | Gyro | `gyro.h` | Get compass (IMU) readings | Finished |
-| Line | `line.h` | Read line sensors and calculate line edge | In progress |
+| Line | `line.h` | Read line sensors and calculate line edge | Finished |
 | Ultrasound | `ultra.h` | Get ultrasound readings and calculate approximate position | In Progress |
 | Camera | `cam.h` | Interface with OpenMV and get goal angles | Not started |
 | Bluetooth | `blue.h` | Inter-robot communications | Not started
-| Orbit | `orbit.h` | Calculate optimal robot trajectories (Offense) | Not started |
-| Goalie | `goalie.h` | Calculate optimal robot trajectories (Defense) | Not started |
+| Orbit | `orbit.h` | Calculate optimal robot trajectories (Offense) | In Progress |
+| Goalie | `goalie.h` | Calculate optimal robot trajectories (Defense) | In Progress |
 | Constants | `constants.hpp` | Stores program constants (ex. pin numbers) | In progress |
 | Main | `main.cpp` | Main program | In progress |
 
 ## Checklist
-- [ ] Orbit
+- [ ] Solenoid
+- [ ] Lightgate
+- [ ] Bluetooth
+- [ ] Ultrasound integration
 - [ ] Ultrasound interfacing
-- [ ] Line Projection
-- [ ] Line Sensor reading
-- [ ] Infrared reliability
+- [ ] Line reliability
+- [ ] Goalie
+- [x] Orbit
+- [x] Line Clamping
+- [x] Line Sensor reading
+- [x] Infrared reliability
 - [x] Basic Infrared code
 - [x] BNO055 interfacing
 - [x] Preliminary motor code

@@ -13,4 +13,5 @@ class Line {
         float _ycomp[24];
         int _line[24];
         int _len(int num);
+        int _prev; // previous line angle
 };

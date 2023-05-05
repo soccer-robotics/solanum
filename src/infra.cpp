@@ -59,7 +59,19 @@ int Infra::read() {
     return atan2(y, x) * 180 / PI;
 }
 
+int Infra::distance() {
+    // rough estimate of distance to ball by averaging all sensors
+    int sum = 0;
+    for (int i=0; i<24; i++) {
+        sum += _ir[i];
+    }
+    Serial.print("dist ");
+    Serial.println(sum / 24);
+    return sum / 24;
+}
+
 int Infra::_len(int num) {
+    // internal function to get number of digits in num (for pretty printing)
     int len = 0;
     while (num > 0) {
         num /= 10;

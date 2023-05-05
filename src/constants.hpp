@@ -20,7 +20,10 @@ namespace constants
     const int LINE_CS[3] = {26, 28, 27};
 
     // Threshold for line sensors
-    const int LINE_THRESHOLD = 600;
+    const int LINE_THRESHOLD = 500;
+
+    // Safety angle for line (how much angular offset when clamping)
+    const int LINE_SAFETY = 20;
 
     // Trigger and echo pins for ultrasonic
     const int ULTRA_TRIG[4] = {14, 15, 16, 17};
