@@ -7,18 +7,18 @@ Build on Platformio; source files stored in `/src`
 ## Components
 | Component | File | Description | Progress |
 |-|-|-|-|
-| Motion | `motion.h` | Take movement angle and speed and output motor commands | Finished |
-| Solenoid | `solenoid.h` | Charge and fire solenoid | Not started |
-| Infrared | `infra.h` | Get infrared sensor readings and calculate ball heading/distance | Finished |
-| Gyro | `gyro.h` | Get compass (IMU) readings | Finished |
-| Line | `line.h` | Read line sensors and calculate line edge | Finished |
-| Ultrasound | `ultra.h` | Get ultrasound readings and calculate approximate position | In Progress |
-| Camera | `cam.h` | Interface with OpenMV and get goal angles | Not started |
-| Bluetooth | `blue.h` | Inter-robot communications | Not started
-| Orbit | `orbit.h` | Calculate optimal robot trajectories (Offense) | In Progress |
-| Goalie | `goalie.h` | Calculate optimal robot trajectories (Defense) | In Progress |
-| Constants | `constants.hpp` | Stores program constants (ex. pin numbers) | In progress |
-| Main | `main.cpp` | Main program | In progress |
+| <a href=https://github.com/soccer-robotics/solanum/blob/master/src/motion.cpp>Motion</a> | `motion.h` | Take movement angle and speed and output motor commands | Finished |
+| <a href=https://github.com/soccer-robotics/solanum/blob/master/src/solenoid.cpp>Solenoid</a> | `solenoid.h` | Charge and fire solenoid | Not started |
+| <a href=https://github.com/soccer-robotics/solanum/blob/master/src/infra.cpp>Infrared</a> | `infra.h` | Get infrared sensor readings and calculate ball heading/distance | Finished |
+| <a href=https://github.com/soccer-robotics/solanum/blob/master/src/gyro.cpp>Gyro</a> | `gyro.h` | Get compass (IMU) readings | Finished |
+| <a href=https://github.com/soccer-robotics/solanum/blob/master/src/line.cpp>Line</a> | `line.h` | Read line sensors and calculate line edge | Finished |
+| <a href=https://github.com/soccer-robotics/solanum/blob/master/src/ultra.cpp>Ultrasound</a> | `ultra.h` | Get ultrasound readings and calculate approximate position | In Progress |
+| <a href=https://github.com/soccer-robotics/solanum/blob/master/src/cam.cpp>Camera</a> | `cam.h` | Interface with OpenMV and get goal angles | Not started |
+| <a href=https://github.com/soccer-robotics/solanum/blob/master/src/blue.cpp>Bluetooth</a> | `blue.h` | Inter-robot communications | Not started
+| <a href=https://github.com/soccer-robotics/solanum/blob/master/src/orbit.cpp>Orbit</a> | `orbit.h` | Calculate optimal robot trajectories (Offense) | In Progress |
+| <a href=https://github.com/soccer-robotics/solanum/blob/master/src/goalie.cpp>Goalie</a> | `goalie.h` | Calculate optimal robot trajectories (Defense) | In Progress |
+| <a href=https://github.com/soccer-robotics/solanum/blob/master/src/constants.hpp>Constants</a> | `constants.hpp` | Stores program constants (ex. pin numbers) | In progress |
+| <a href=https://github.com/soccer-robotics/solanum/blob/master/src/main.cpp>Main</a> | `main.cpp` | Main program | In progress |
 
 ## Checklist
 - [ ] Solenoid
