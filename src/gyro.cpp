@@ -34,3 +34,14 @@ int Gyro::getHeading() {
     Serial.println("gyro " + String(h));
     return h;
 }
+
+int Gyro::getCorrection() {
+    int h = getHeading();
+    if (h > 180) {
+        h -= 360;
+    }
+    int correction = P * h + I * _integral;
+    _integral += h;
+    Serial.println("gyro_correction " + String(correction));
+    return correction;
+}

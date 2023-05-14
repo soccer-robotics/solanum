@@ -17,6 +17,8 @@ Line line;
 Motion motion;
 Ultra ultra;
 Orbit orbit;
+Goalie goalie;
+Bluetooth blue(7, 8);
 
 bool switchState = 0;
 
@@ -29,7 +31,7 @@ void setup() {
         pinMode(constants::MOTORPINS[i][0], OUTPUT);
         pinMode(constants::MOTORPINS[i][1], OUTPUT);
     }
-    gyro.calibrate();
+    //gyro.calibrate();
     // flash LED to indicate calibration
     for (int i=0; i<3; i++) {
         digitalWrite(13, HIGH);
@@ -37,6 +39,8 @@ void setup() {
         digitalWrite(13, LOW);
         delay(200);
     }
+    pinMode(22, INPUT);
+    pinMode(5, OUTPUT);
 }
 
 void loop_motorTest() {
@@ -92,13 +96,7 @@ void loop_sens() {
 }
 
 void loop_orbit() {
-    int ang = gyro.getHeading();
-
-    // simple proportional control
-    if (ang > 180) {
-        ang -= 360;
-    }
-    int rot = ang * 1.5;
+    int rot = gyro.getCorrection();
 
     // track ball
     ballAngle = infra.read();
@@ -112,7 +110,109 @@ void loop_orbit() {
 
     // move
     motion.move(orbitAngle, 255, -rot);
+
+    // kick
+    if (orbit.readyToKick()) {
+        digitalWrite(5, HIGH);
+        delay(100);
+        digitalWrite(5, LOW);
+    }
+    
+    // back off, if line detected in front
+    std::pair<int, int> l = line.getLine();
+    int diff = ( (l.first * 15 - l.second * 15 + 180 + 360 ) % 360 ) - 180;
+    int l_angle = (360 + l.second * 15 + ( diff / 2 ) ) % 360;
+
+    if (l_angle > 60 && l_angle < 120) {
+        for (int i=0; i<30; i++) {
+            int rot = gyro.getCorrection();
+            motion.move(270, 255, -rot);
+            delay(10);
+        }
+    }
     delay(2);
+}
+
+void loop_goalie() {
+    int rot = gyro.getCorrection();
+
+    // track ball
+    ballAngle = infra.read();
+    int proximity = infra.distance();
+
+    // get goalie direction/power
+    int goaliePwr = goalie.getPower(ballAngle, proximity);
+    Serial.println("goaliePwr: " + String(goaliePwr));
+
+    // correct y-position (set offset)
+    int offset = 0;
+    std::pair<int, int> l = line.getLine();
+    if (l.first == -1) {
+        offset = 30; // backwards
+    }
+    else {
+        int diff = ( (l.first * 15 - l.second * 15 + 180 + 360 ) % 360 ) - 180;
+        int l_angle = (360 + l.second * 15 + ( diff / 2 ) ) % 360;
+        // convert to azimuth
+        int a = (360 + l_angle - 90) % 360;
+        if (a > 180) {
+            a -= 360;
+        }
+        a = -a;
+        if (a < -45 && a > -135) {
+            for (int i=0; i<30; i++) {
+                int rot = gyro.getCorrection();
+                motion.move(180, 230, -rot); // left
+                delay(2);
+            }
+            offset = -45;
+        }
+        else if (a > 45 && a < 135) {
+            for (int i=0; i<30; i++) {
+                int rot = gyro.getCorrection();
+                motion.move(0, 230, -rot); // right
+                delay(2);
+            }
+            offset = -45;
+        }
+        else if (abs(a) < 45) {
+            offset = -30; // forwards
+        }
+        else {
+            offset = 30; // backwards
+        }
+    }
+
+    // move
+    if (goaliePwr > 0) {
+        //int a = line.redirect(180 + offset);
+        motion.move(180 + offset, goaliePwr, -rot);
+    }
+    else {
+        //int a = line.redirect(0 - offset);
+        motion.move(0 - offset, -goaliePwr, -rot);
+    }
+    delay(2);
+    
+    if (analogRead(22) < 100) { // lightgate
+        motion.move(0, 0, 0);
+        digitalWrite(5, HIGH); // fire kicker
+        delay(50);
+        digitalWrite(5, LOW);
+        delay(400);
+    }
+}
+
+void loop_testDip() {
+    Serial.print("dip ");
+    Serial.print(digitalRead(34));
+    Serial.print(" ");
+    Serial.print(digitalRead(35));
+    Serial.print(" ");
+    Serial.print(digitalRead(30));
+    Serial.print(" ");
+    Serial.println(digitalRead(31));
+    delay(100);
 }
 
 void loop() {
@@ -130,7 +230,10 @@ void loop() {
     }
     // When switch is on:
     else if (switchState == 1) {
-        loop_orbit();
+        if (Serial.available()) {
+            blue.send(Serial.readString());
+        }
+        Serial.print(blue.receive());
     }
     // When switch is off:
     else if (switchState == 0) {

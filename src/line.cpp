@@ -83,11 +83,12 @@ int Line::redirect(int angle) {
     int l_angle = (360 + line.second * 15 + ( diff / 2 ) ) % 360;
 
     // if the line angle has flipped, we are crossing the line: initiate panic return
+    int line_vector_change = (_prev - l_angle + 180) % 360 - 180;
+    line_vector_change = line_vector_change < -180 ? line_vector_change + 360 : line_vector_change;
+    line_vector_change = abs(line_vector_change);
+
     if (_prev != -1 &&
-        min(
-            180 - abs(abs(l_angle - _prev) % 360 - 180),
-            180 - abs(abs(_prev - l_angle) % 360 - 180)
-        ) > 160
+        line_vector_change > 160
     ) {
         return _prev;
     }

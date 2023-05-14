@@ -43,24 +43,24 @@ void Motion::move(int angle, double speed, int rot) {
     if (abs(y+rot) > max) {
         max = abs(y + rot);
     }
-    x = x * 255 / max;
-    y = y * 255 / max;
+    x = x * speed / max;
+    y = y * speed / max;
 
     // set topleft
     digitalWrite(_pins[0][0], (y + rot) > 0);
-    analogWrite(_pins[0][1], abs(y + rot));
+    analogWrite(_pins[0][1], min(255, abs(y + rot)));
 
     // set topright
     digitalWrite(_pins[1][0], (x + rot) > 0);
-    analogWrite(_pins[1][1], abs(x + rot));
+    analogWrite(_pins[1][1], min(255, abs(x + rot)));
 
     // set bottomright
     digitalWrite(_pins[2][0], (-y + rot) > 0);
-    analogWrite(_pins[2][1], abs(-y + rot));
+    analogWrite(_pins[2][1], min(255, abs(-y + rot)));
 
     // set bottomleft
     digitalWrite(_pins[3][0], (-x + rot) > 0);
-    analogWrite(_pins[3][1], abs(-x + rot));
+    analogWrite(_pins[3][1], min(255, abs(-x + rot)));
 }
 
 void Motion::panic() {
