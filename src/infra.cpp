@@ -36,10 +36,20 @@ int Infra::read() {
     // _ir[13] = (_ir[11] + _ir[14]) / 2;
 
     // simulate values for every other sensor (since not soldered yet)
-    _ir[0] = (_ir[1] + _ir[23]) / 2;
+    /*_ir[0] = (_ir[1] + _ir[23]) / 2;
     for (int i=2; i<24; i+=2) {
         _ir[i] = (_ir[i+1] + _ir[i-1]) / 2;
+    }*/
+
+    // auto-detect failed sensors and set them to average of neighbors
+    for (int i=0; i<24; i++) {
+        if (_ir[i] == 1024 || _ir[i] == 1023) {
+            _ir[i] = (_ir[(i + 1) % 24] + _ir[(i + 23) % 24]) / 2;
+        }
     }
+
+    // bandage #22
+    _ir[22] = (_ir[21] + _ir[23]) / 2;
 
     // vector addition of all 24 sensors
     int x = 0;

@@ -21,7 +21,7 @@ int Orbit::getOrbit(int angle, int proximity) {
     }
     // calculate orbit
     //proximity = _distscl;
-    float damp = min(1.0, 0.02 * exp(5.5 * proximity));
+    float damp = min(1.0, 0.02 * exp(10 * proximity));
     float offset = 0;
     int ret;
     if (angle > 0) {
@@ -33,7 +33,7 @@ int Orbit::getOrbit(int angle, int proximity) {
         ret = (int)(angle - offset * damp + 90 + 360) % 360;
     }
     // test if angle is forward
-    if (abs(ret - 90) < 20) {
+    if (abs(ret - 90) < 40) {
         forwardCtr++;
     }
     else {
@@ -43,5 +43,5 @@ int Orbit::getOrbit(int angle, int proximity) {
 }
 
 bool Orbit::readyToKick() {
-    return forwardCtr > 80;
+    return forwardCtr > 10 && analogRead(22) < 300;
 }

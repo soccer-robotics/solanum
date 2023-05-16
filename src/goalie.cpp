@@ -20,7 +20,7 @@ int Goalie::getPower(int angle, int proximity) {
     return min(255, max(-255,
         (int)(
             _urgency * angle
-            + 200 * ((angle > 0) - (angle < 0)) // sign of angle
+            + 100 * ((angle > 0) - (angle < 0)) // sign of angle
         )
     )); // simple for now
 }

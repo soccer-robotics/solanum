@@ -18,11 +18,15 @@ Motion motion;
 Ultra ultra;
 Orbit orbit;
 Goalie goalie;
-Bluetooth blue(7, 8);
+//Bluetooth blue(7, 8);
 
 bool switchState = 0;
 
 int ballAngle;
+
+int mode = 1; // 0 = orbit, 1 = goalie
+
+int goalieForwardLineCounter = 0;
 
 void setup() {
     pinMode(constants::SWITCHPIN, INPUT);
@@ -31,7 +35,7 @@ void setup() {
         pinMode(constants::MOTORPINS[i][0], OUTPUT);
         pinMode(constants::MOTORPINS[i][1], OUTPUT);
     }
-    //gyro.calibrate();
+    gyro.calibrate();
     // flash LED to indicate calibration
     for (int i=0; i<3; i++) {
         digitalWrite(13, HIGH);
@@ -142,15 +146,22 @@ void loop_goalie() {
 
     // get goalie direction/power
     int goaliePwr = goalie.getPower(ballAngle, proximity);
-    Serial.println("goaliePwr: " + String(goaliePwr));
+    //Serial.println("goaliePwr: " + String(goaliePwr));
 
     // correct y-position (set offset)
     int offset = 0;
     std::pair<int, int> l = line.getLine();
     if (l.first == -1) {
-        offset = 30; // backwards
+        if (goalieForwardLineCounter < 50) {
+            goalieForwardLineCounter++;
+            offset = -30; // forwards
+        }
+        else {
+            offset = 30; // backwards
+        }
     }
     else {
+        goalieForwardLineCounter = 0;
         int diff = ( (l.first * 15 - l.second * 15 + 180 + 360 ) % 360 ) - 180;
         int l_angle = (360 + l.second * 15 + ( diff / 2 ) ) % 360;
         // convert to azimuth
@@ -158,6 +169,8 @@ void loop_goalie() {
         if (a > 180) {
             a -= 360;
         }
+
+        /* ---- failed line edge detection ----
         a = -a;
         if (a < -45 && a > -135) {
             for (int i=0; i<30; i++) {
@@ -175,11 +188,70 @@ void loop_goalie() {
             }
             offset = -45;
         }
-        else if (abs(a) < 45) {
-            offset = -30; // forwards
+        */
+
+        if (abs(a) < 45) {
+            offset = -20; // forwards
         }
         else {
-            offset = 30; // backwards
+            offset = 20; // backwards
+        }
+
+        /*
+            edge algorithm:
+            partition line sensor circle into left and right half
+            if both sensors on line are in the same half, then move in that direction
+            otherwise:
+                calculate how far each sensor is from the forward vector
+                if the left sensor is much closer than the right sensor, then move left
+                if the right sensor is much closer than the left sensor, then move right
+        */
+
+        int j = (24 + l.first - 24 / 4) % 24;
+        int k = (24 + l.second - 24 / 4) % 24;
+
+        if (j > 12) {
+            j -= 24;
+        }
+        if (k > 12) {
+            k -= 24;
+        }
+
+        // check sign
+        if (j < 0 && k < 0) {
+            // both on right
+            for (int i=0; i<30; i++) {
+                int rot = gyro.getCorrection();
+                motion.move(0, 160, -rot); // right
+                delay(2);
+            }
+        }
+        else if (j > 0 && k > 0) {
+            // both on left
+            for (int i=0; i<30; i++) {
+                int rot = gyro.getCorrection();
+                motion.move(180, 160, -rot); // left
+                delay(2);
+            }
+        }
+        else {
+            // one on left, one on right
+            if (abs(j) > abs(k) + 6) {
+                // left closer
+                for (int i=0; i<30; i++) {
+                    int rot = gyro.getCorrection();
+                    motion.move(160, 160, -rot); // left
+                    delay(2);
+                }
+            }
+            else if (abs(k) > abs(j) + 6) {
+                // right closer
+                for (int i=0; i<30; i++) {
+                    int rot = gyro.getCorrection();
+                    motion.move(20, 160, -rot); // right
+                    delay(2);
+                }
+            }
         }
     }
 
@@ -192,15 +264,20 @@ void loop_goalie() {
         //int a = line.redirect(0 - offset);
         motion.move(0 - offset, -goaliePwr, -rot);
     }
-    delay(2);
-    
-    if (analogRead(22) < 100) { // lightgate
+    delay(10);
+    /*if (proximity > 700) {
+        loop_orbit();
+    }*/
+    /*
+    if (analogRead(22) < 300) { // lightgate
         motion.move(0, 0, 0);
         digitalWrite(5, HIGH); // fire kicker
-        delay(50);
+        delay(100);
         digitalWrite(5, LOW);
-        delay(400);
-    }
+        delay(200);
+        //mode = 0;
+        //blue.send("sw");
+    }*/
 }
 
 void loop_testDip() {
@@ -230,10 +307,23 @@ void loop() {
     }
     // When switch is on:
     else if (switchState == 1) {
-        if (Serial.available()) {
-            blue.send(Serial.readString());
+        /*if (mode == 0) {
+            loop_orbit();
+            String a = blue.receive();
+            if (a != "sw") {
+                mode = 1;
+            }
         }
-        Serial.print(blue.receive());
+        else if (mode == 1) {
+            loop_goalie();
+        }*/
+        if (mode == 0) {
+            loop_orbit();
+        }
+        else if (mode == 1) {
+            loop_goalie();
+        }
+        //loop_sens();
     }
     // When switch is off:
     else if (switchState == 0) {
