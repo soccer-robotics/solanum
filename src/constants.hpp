@@ -1,3 +1,7 @@
+/*
+Program constants (pin numbers, thresholds, etc.)
+*/
+
 namespace constants
 {
     // Pin numbers for motor drivers
@@ -11,7 +15,7 @@ namespace constants
     // SPI communication
     const int MISO = 12;
     const int MOSI = 11;
-    const int SCK = 13; // CHANGE?
+    const int SCK = 13;
 
     // ADC pins for Infrared
     const int INFRA_CS[3] = {37, 36, 10}; //{10, 36, 37};
@@ -29,9 +33,16 @@ namespace constants
     const int ULTRA_TRIG[4] = {14, 15, 16, 17};
     const int ULTRA_ECHO = 20;
 
-    // Pin number for solenoid (CHANGE!!)
+    // Pin number for solenoid
     const int SOLENOIDPIN = 5;
+
+    // Light gate pin
+    const int LIGHTGATE = 22;
 
     // Software switch
     const int SWITCHPIN = 32;
+
+    // Field dimensions
+    const int FIELD_WIDTH = 182;
+    const int FIELD_HEIGHT = 243;
 }

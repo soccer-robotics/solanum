@@ -32,7 +32,7 @@ void Ultra::debug() {
     Serial.print("Ultra ");
     for (int i=0; i<4; i++) {
         Serial.print(read(i));
-        Serial.print(" ");
+        //Serial.print(" -1 ");
         delay(50);
     }
     Serial.println();

@@ -1,3 +1,7 @@
+/*
+Interface with BNO055 gyro and implement angle correction PID calculations
+*/
+
 #include <gyro.h>
 #include <Arduino.h>
 
@@ -42,6 +46,16 @@ int Gyro::getCorrection() {
     }
     int correction = P * h + I * _integral;
     _integral += h;
+    Serial.println("gyro_correction " + String(correction));
+    return correction;
+}
+
+int Gyro::getCorrection(int offset) {
+    int h = getHeading();
+    if (h > 180) {
+        h -= 360;
+    }
+    int correction = 3 * P * (h - offset);
     Serial.println("gyro_correction " + String(correction));
     return correction;
 }

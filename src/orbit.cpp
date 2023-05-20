@@ -4,12 +4,13 @@
 #include <Arduino.h>
 
 Orbit::Orbit() {
-    _aggressiveness = 0.04;
-    _multiplier = 0.15;
-    _distscl = 80;
+    _aggressiveness = 0.09;
+    _multiplier = 0.18;
+    _distscl = 160;
     _tuneAngle = 0;
     _tuneScale = 0;
     forwardCtr = 0;
+    kickTimer = 0;
 }
 
 int Orbit::getOrbit(int angle, int proximity) {
@@ -21,7 +22,7 @@ int Orbit::getOrbit(int angle, int proximity) {
     }
     // calculate orbit
     //proximity = _distscl;
-    float damp = min(1.0, 0.02 * exp(10 * proximity));
+    float damp = min(1.0, 0.02 * exp(4.5 * (float) proximity / _distscl));
     float offset = 0;
     int ret;
     if (angle > 0) {
@@ -33,15 +34,21 @@ int Orbit::getOrbit(int angle, int proximity) {
         ret = (int)(angle - offset * damp + 90 + 360) % 360;
     }
     // test if angle is forward
-    if (abs(ret - 90) < 40) {
+    if (abs(ret - 90) < 20) {
         forwardCtr++;
     }
     else {
         forwardCtr = 0;
     }
+    kickTimer++;
     return ret;
 }
 
 bool Orbit::readyToKick() {
-    return forwardCtr > 10 && analogRead(22) < 300;
+    bool res = forwardCtr > 30 && analogRead(22) < 300;
+    if (res && kickTimer > 300) {
+        kickTimer = 0;
+        return true;
+    }
+    return false;
 }

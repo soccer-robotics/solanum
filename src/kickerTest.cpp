@@ -1,3 +1,7 @@
+/*
+Simple test program for kicker
+*/
+
 #include <Arduino.h>
 
 void setup_k() {

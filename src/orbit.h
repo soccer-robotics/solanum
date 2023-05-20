@@ -12,4 +12,5 @@ class Orbit {
         // formula: min(aggressiveness * e^(multiplier * angle), 90)
 
         int forwardCtr;
+        int kickTimer;
 };

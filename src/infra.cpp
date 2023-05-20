@@ -1,3 +1,7 @@
+/*
+Get infrared sensor readings and calculate ball heading/distance
+*/
+
 #include <infra.h>
 #include <constants.hpp>
 #include <MCP3XXX.h>
@@ -40,16 +44,28 @@ int Infra::read() {
     for (int i=2; i<24; i+=2) {
         _ir[i] = (_ir[i+1] + _ir[i-1]) / 2;
     }*/
-
-    // auto-detect failed sensors and set them to average of neighbors
+    
+    // auto-detect failed sensors and set them to average of neighbours
     for (int i=0; i<24; i++) {
-        if (_ir[i] == 1024 || _ir[i] == 1023) {
+        if (_ir[i] == 1024 ||
+            _ir[i] == 1023 ||
+            (
+                abs(_ir[i] - _ir[(i+1)%24]) > 500 &&
+                abs(_ir[i] - _ir[(i+23)%24]) > 500
+            )
+        ) {
             _ir[i] = (_ir[(i + 1) % 24] + _ir[(i + 23) % 24]) / 2;
         }
     }
-
+    
     // bandage #22
-    _ir[22] = (_ir[21] + _ir[23]) / 2;
+    /*_ir[22] = (_ir[21] + _ir[23]) / 2;
+
+    // bandage #16, #18, #20
+    //_ir[16] = (_ir[15] + _ir[17]) / 2;
+    _ir[18] = (_ir[17] + _ir[19]) / 2;
+    //_ir[20] = (_ir[19] + _ir[21]) / 2;
+    _ir[12] = (_ir[11] + _ir[13]) / 2;*/
 
     // vector addition of all 24 sensors
     int x = 0;
@@ -88,4 +104,9 @@ int Infra::_len(int num) {
         len++;
     }
     return len;
+}
+
+int Infra::getReading(int num) {
+    // get reading of sensor num
+    return _ir[num];
 }

@@ -1,11 +1,14 @@
+/*
+Calculates the goalie movement power based on the angle and proximity of the ball.
+*/
+
 #include <goalie.h>
 #include <Arduino.h>
 #include <constants.hpp>
 
 Goalie::Goalie() {
-    _urgency = 3.0;
+    _urgency = 5.0;
     _eagerness = 0;
-    _restraint = 0;
 }
 
 int Goalie::getPower(int angle, int proximity) {
@@ -17,10 +20,13 @@ int Goalie::getPower(int angle, int proximity) {
         angle -= 360;
     }
     // move horizontally
-    return min(255, max(-255,
+    int res = min(255, max(-255,
         (int)(
-            _urgency * angle
-            + 100 * ((angle > 0) - (angle < 0)) // sign of angle
+            _urgency * angle * min(1.0, 0.02 * exp(4.5 * (float) proximity / 60)) + 
+            _eagerness * abs(angle - prevAngle)
+            //+ 150 * ((angle > 0) - (angle < 0)) // sign of angle
         )
-    )); // simple for now
+    )); 
+    prevAngle = angle;
+    return res;
 }

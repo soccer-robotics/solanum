@@ -1,3 +1,7 @@
+/*
+Communication routines with HC-05 Bluetooth module
+*/
+
 #include <SoftwareSerial.h>
 #include <Arduino.h>
 #include <blue.h>
