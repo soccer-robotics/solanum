@@ -4,7 +4,7 @@
 #include <Arduino.h>
 
 Orbit::Orbit() {
-    _aggressiveness = 0.09;
+    _aggressiveness = 0.04;
     _multiplier = 0.18;
     _distscl = 160;
     _tuneAngle = 0;
@@ -16,13 +16,13 @@ Orbit::Orbit() {
 int Orbit::getOrbit(int angle, int proximity) {
     angle -= 90;
     // normalize to -180 to 180
-    angle = (angle + 360) % 360;
+    angle = (angle + 720) % 360;
     if (angle > 180) {
         angle -= 360;
     }
     // calculate orbit
     //proximity = _distscl;
-    float damp = min(1.0, 0.02 * exp(4.5 * (float) proximity / _distscl));
+    float damp = min(1.0, 0.02 * exp(4.6 * (float) proximity / _distscl));
     float offset = 0;
     int ret;
     if (angle > 0) {

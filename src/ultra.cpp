@@ -18,9 +18,9 @@ int Ultra::read(int idx) {
     digitalWrite(constants::ULTRA_TRIG[idx], LOW);
     
     // read echo
-    int duration = pulseIn(constants::ULTRA_ECHO, HIGH);
+    int duration = pulseIn(constants::ULTRA_ECHO, HIGH);//, 15550);
     int distance = (duration/2) / 29.1;
-    if (distance >= 200 || distance <= 0){
+    if (distance >= 250 || distance <= 0){
         return -1; // out of range or error
     }
     else {
@@ -32,6 +32,7 @@ void Ultra::debug() {
     Serial.print("Ultra ");
     for (int i=0; i<4; i++) {
         Serial.print(read(i));
+        Serial.print(" ");
         //Serial.print(" -1 ");
         delay(50);
     }

@@ -26,10 +26,10 @@ Goalie goalie;
 // 2 = sensor test
 // 3 = kicker test
 // 4 = goal rotation
-int mode = 0;
+int mode = 1;
 
 // do we use ultrasounds?
-bool useUltra = 0;
+bool useUltra = 1;
 
 bool switchState = 0;
 int ballAngle;
@@ -108,7 +108,7 @@ void loop_ballTrack() {
 }
 
 void loop_sens() {
-    //infra.read();
+    infra.read();
     gyro.getHeading();
     line.getLine();
     Serial.println("gate " + String(analogRead(constants::LIGHTGATE)));
@@ -122,12 +122,16 @@ void loop_goalRotate() {
 
     // get four ultrasound readings
     int r = ultra.read(0);
-    delay(50);
+    delay(20);
     int l = ultra.read(2);
-    delay(50);
+    delay(20);
     int f = ultra.read(1);
-    delay(50);
+    delay(20);
     int b = ultra.read(3);
+
+    if (r == -1 || l == -1 || f == -1 || b == -1) {
+        return;
+    }
 
     // calculate expected position
     int x_l = l;
@@ -160,9 +164,8 @@ void loop_goalRotate() {
         std::pair<int, int> l = line.getLine();
         int diff = ( (l.first * 15 - l.second * 15 + 180 + 360 ) % 360 ) - 180;
         int l_angle = (360 + l.second * 15 + ( diff / 2 ) ) % 360;
-
-        if (l_angle > 60 && l_angle < 120) {
-            motion.move(270, 255, 0);
+        if (l_angle > 50 && l_angle < 130) {
+            motion.move(270, 220, 0);
             digitalWrite(5, HIGH);
             delay(50);
             digitalWrite(5, LOW);
@@ -173,23 +176,21 @@ void loop_goalRotate() {
             }
             return;
         }
-        delay(2);
     }
 
     // kick
     digitalWrite(5, HIGH);
-    delay(100);
+    delay(50);
     digitalWrite(5, LOW);
 
-    /*
+    
     // move back
-    for (int i=0; i<100; i++) {
+    /*for (int i=0; i<20; i++) {
         int rot = gyro.getCorrection();
         motion.move(line.redirect(270), 255, -rot);
         delay(5);
-    }
-    motion.panic();
-    */
+    }*/
+    //motion.panic();
 }
 
 void loop_orbit() {
@@ -206,6 +207,10 @@ void loop_orbit() {
         loop_goalRotate();
     }
 
+    /*if (abs(ballAngle - 90) < 20) {
+        orbitAngle = 90;
+    }*/
+
     orbitAngle = line.redirect(orbitAngle);
 
     // move
@@ -220,23 +225,26 @@ void loop_orbit() {
     
     // back off, if line detected in front or back
     std::pair<int, int> l = line.getLine();
-    int diff = ( (l.first * 15 - l.second * 15 + 180 + 360 ) % 360 ) - 180;
-    int l_angle = (360 + l.second * 15 + ( diff / 2 ) ) % 360;
+    if (l.first != -1 && l.second != -1) {
+        int diff = ( (l.first * 15 - l.second * 15 + 180 + 360 ) % 360 ) - 180;
+        int l_angle = (360 + l.second * 15 + ( diff / 2 ) ) % 360;
 
-    if (l_angle > 60 && l_angle < 120) {
-        for (int i=0; i<30; i++) {
-            int rot = gyro.getCorrection();
-            motion.move(270, 255, -rot);
-            delay(10);
+        if (l_angle > 60 && l_angle < 120) {
+            for (int i=0; i<10; i++) {
+                int rot = gyro.getCorrection();
+                motion.move(270, 255, -rot);
+                delay(2);
+            }
+        }
+        else if (l_angle > 240 && l_angle < 300) {
+            for (int i=0; i<10; i++) {
+                int rot = gyro.getCorrection();
+                motion.move(90, 255, -rot);
+                delay(2);
+            }
         }
     }
-    else if (l_angle > 240 && l_angle < 300) {
-        for (int i=0; i<30; i++) {
-            int rot = gyro.getCorrection();
-            motion.move(90, 255, -rot);
-            delay(10);
-        }
-    }
+    
     delay(2);
 }
 
@@ -314,9 +322,9 @@ void loop_ultra() {
         delay(50);
         int l = ultra.read(2);
         delay(50);
-        int b = ultra.read(3);
-        delay(50);
-        int dirVal = b > 37 ? 120 : 60; // backwards if too far from wall, else forwards
+        //int b = ultra.read(3);
+        //delay(50);
+        int dirVal = 120; // b > 37 ? 120 : 60; // backwards if too far from wall, else forwards
         if (r != -1 && l != -1) {
             if (r < l) {
                 orbitUltraOffset = dirVal; // offset to left
@@ -357,8 +365,10 @@ void loop_goalie() {
             offset = 30; // backwards
         }
         // ultrasound centering
-        loop_ultra();
-        return;
+        if (useUltra) {
+            loop_ultra();
+            return;
+        }
     }
     else {
         goalieForwardLineCounter = 0;
@@ -397,12 +407,15 @@ void loop_goalie() {
             offset = 20; // backwards
         }
 
-        int b = ultra.read(3);
-        if (b < 35) {
-            offset = -20; // forwards
-        }
-        else if (b > 40) {
-            offset = 20; // backwards
+        if (useUltra) {
+            /*
+            int b = ultra.read(3);
+            if (b < 35) {
+                offset = -20; // forwards
+            }
+            else if (b > 40) {
+                offset = 20; // backwards
+            }*/           
         }
 
         /*
@@ -478,8 +491,8 @@ void loop_goalie() {
         loop_orbit();
     }*/
     
-    if (analogRead(22) < 300 || infra.getReading(5) > 700) { // lightgate or proximity
-        for (int i=0; i<40; i++) {
+    if (analogRead(22) < 350) { // lightgate
+        for (int i=0; i<20; i++) {
             int rot = gyro.getCorrection();
             motion.move(90, 255, -rot);
             delay(5);
